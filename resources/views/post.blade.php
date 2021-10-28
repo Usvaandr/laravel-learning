@@ -5,11 +5,9 @@
 
 <body>
 <article>
-    <p>
-        <?= $post; ?>
-    </p>
+
+    <?= $post; ?>
+
     <a href="/">Go Back</a>
 </article>
-
-
 </body>

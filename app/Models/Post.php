@@ -27,6 +27,16 @@ class Post
         return self::all()->firstWhere('slug', $slug);
     }
 
+    public static function findOrFail($slug)
+    {
+        $post = self::find($slug);
+        if (! $post) {
+            abort(404);
+        }
+
+        return $post;
+    }
+
     public static function all()
     {
         //added cache to post.all

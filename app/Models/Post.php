@@ -2,61 +2,24 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\File;
-use Spatie\YamlFrontMatter\YamlFrontMatter;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class Post
+class Post extends Model
 {
-    public $title;
-    public $excerpt;
-    public $date;
-    public $body;
-    public $slug;
+    use HasFactory;
 
-    public function __construct($title, $excerpt, $date, $body, $slug)
+    protected $guarded = ['id'];
+
+    protected $with = ['category', 'author'];
+
+    public function category()
     {
-        $this->title = $title;
-        $this->excerpt = $excerpt;
-        $this->date = $date;
-        $this->body = $body;
-        $this->slug = $slug;
+      return $this->belongsTo(Category::class);
     }
 
-    public static function find($slug)
+    public function author()
     {
-        return self::all()->firstWhere('slug', $slug);
-    }
-
-    public static function findOrFail($slug)
-    {
-        $post = self::find($slug);
-        if (! $post) {
-            abort(404);
-        }
-
-        return $post;
-    }
-
-    public static function all()
-    {
-        //added cache to post.all
-        return cache()->rememberForever('post.all', function () {
-            $files = File::files(resource_path("posts/"));
-
-            return collect($files)
-                ->map(function ($file) {
-                    return YamlFrontMatter::parseFile($file);
-                })
-                ->map(function ($document) {
-                    return new Post(
-                        $document->title,
-                        $document->excerpt,
-                        $document->date,
-                        $document->body(),
-                        $document->slug
-                    );
-                })
-                ->sortByDesc('date');
-        });
+        return $this->belongsTo(User::class, 'user_id');
     }
 }
